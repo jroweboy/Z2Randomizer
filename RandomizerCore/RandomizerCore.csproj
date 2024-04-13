@@ -40,6 +40,8 @@
   <ItemGroup>
     <None Remove="Asm\DashSpell.s" />
     <None Remove="Asm\FixedHud.s" />
+    <None Remove="Asm\Parallax.s" />
+    <None Remove="Asm\ParallaxRaw\parallax.chr" />
     <None Remove="Asm\Recoil.s" />
     <None Remove="CustomRooms.json" />
     <None Remove="nlog.config" />
@@ -168,6 +170,8 @@
     <EmbeddedResource Include="Asm\FixedHud.s" />
     <EmbeddedResource Include="Asm\MMC5.s" />
     <EmbeddedResource Include="Asm\DashSpell.s" />
+    <EmbeddedResource Include="Asm\Parallax.s" />
+    <EmbeddedResource Include="Asm\parallax.chr" />
     <EmbeddedResource Include="Asm\Recoil.s" />
   </ItemGroup>
 </Project>

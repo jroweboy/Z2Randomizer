@@ -6,6 +6,7 @@ using System.Text;
 using System.Reflection;
 using System.Threading.Tasks;
 using Z2Randomizer.Core.Overworld;
+using System.Security.Cryptography;
 
 namespace Z2Randomizer.Core;
 
@@ -177,6 +178,13 @@ internal static class AssemblyExtensions
         using var stream = assembly.GetManifestResourceStream(name);
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
+    }
+    public static byte[] ReadBinaryResource(this Assembly assembly, string name)
+    {
+        // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
+        using var stream = assembly.GetManifestResourceStream(name);
+        using var reader = new BinaryReader(stream);
+        return reader.ReadBytes((int)stream.Length);
     }
     public static async Task<string> ReadResourceAsync(this Assembly assembly, string name)
     {

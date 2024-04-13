@@ -360,7 +360,6 @@ public class Hyrule
         shuffler.ShuffleDrops(ROMData, RNG);
         shuffler.ShufflePbagAmounts(ROMData, RNG);
 
-        ROMData.ExtendMapSize();
         ROMData.DisableTurningPalacesToStone();
         ROMData.UpdateMapPointers();
 
@@ -2130,6 +2129,8 @@ public class Hyrule
             ROMData.Put(0xF586, 0xEA);
         }
         ROMData.UpdateSprites(props.CharSprite, props.TunicColor, props.ShieldColor, props.BeamSprite);
+        // Add the parallax here just to keep it next to each other
+        ROMData.Put(0x20010 + 0x1c000, Assembly.GetExecutingAssembly().ReadBinaryResource("RandomizerCore.Asm.parallax.chr"));
 
         if (props.EncounterRate == EncounterRate.NONE)
         {
@@ -3611,7 +3612,14 @@ FixSoftlock:
         a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.FixedHud.s"), "fixed_hud.s");
         engine.Modules.Add(a.Actions);
     }
-    
+    public void ParallaxBackground(Engine engine, bool useParallax)
+    {
+        Assembler.Assembler a = new();
+        a.Assign("ENABLE_PARALLAX_BACKGROUND", useParallax ? 1 : 0);
+        a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.Parallax.s"), "parallax.s");
+        engine.Modules.Add(a.Actions);
+    }
+
     public void StandardizeDrops(Engine engine)
     {
         Assembler.Assembler a = new();
@@ -3689,11 +3697,14 @@ StandardizeDrops:
 
         if (props.StandardizeDrops)
         {
+            StandardizeDrops(engine);
         }
         FixSoftLock(engine);
         ApplyHudFixes(engine, props.DisableHUDLag);
         RandomizeStartingValues(engine);
-        
+        ParallaxBackground(engine, true);
+
+        ROMData.ExtendMapSize(engine);
         ROMData.FixContinentTransitions(engine);
     }
 }
