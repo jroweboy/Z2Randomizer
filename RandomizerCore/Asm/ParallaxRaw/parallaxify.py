@@ -111,14 +111,26 @@ def parallaxify():
         # clear the image
         im.paste(0, (0,0,128,32))
         for j in range(0, tiles):
-            print( [16*x for x in (0, 0 + j, 1, 1 + j)] )
-            region = shifted.crop([16*x for x in (0, 0 + j, 1, 1 + j)])
-            print( [16*x for x in (0 + (j % 8), 0 + (j // 8), 1 + (j % 8), 1 + (j // 8))] )
-            im.paste(region, [16*x for x in (0 + (j % 8), 0 + (j // 8), 1 + (j % 8), 1 + (j // 8))])
+            # print( [16*x for x in (0, 0 + j, 1, 1 + j)] )
+            # region = shifted.crop([16*x for x in (0, 0 + j, 1, 1 + j)])
+            print( [8*x for x in (0 + (j % 8), 0 + (j // 8), 1 + (j % 8), 1 + (j // 8))] )
+            # arrange the tiles so that they look good in a 8x16 view
+            # top left
+            top_left_region = shifted.crop([8*x for x in (0, 0 + j*2, 1, 1 + j*2)])
+            im.paste(top_left_region, [8*x for x in (0 + 4 * (j % 4), 0 + (j // 4), 1 + 4 * (j % 4), 1 + (j // 4))])
+            # bot left
+            bot_left_region = shifted.crop([8*x for x in (0, 1 + j*2, 1, 2 + j*2)])
+            im.paste(bot_left_region, [8*x for x in (1 + 4 * (j % 4), 0 + (j // 4), 2 + 4 * (j % 4), 1 + (j // 4))])
+            # top right
+            top_right_region = shifted.crop([8*x for x in (1, 0 + j*2, 2, 1 + j*2)])
+            im.paste(top_right_region, [8*x for x in (2 + 4 * (j % 4), 0 + (j // 4), 3 + 4 * (j % 4), 1 + (j // 4))])
+            # bot right
+            bot_right_region = shifted.crop([8*x for x in (1, 1 + j*2, 2, 2 + j*2)])
+            im.paste(bot_right_region, [8*x for x in (3 + 4 * (j % 4), 0 + (j // 4), 4 + 4 * (j % 4), 1 + (j // 4))])
         out = b''.join(pilbmp2chr(im))
         out += bytes(1024 - len(out))
         outdata += out
-    with open(f"{curpath}/parallax.chr", "wb") as fout:
+    with open(f"{curpath}/../parallax.chr", "wb") as fout:
         fout.write(outdata)
 
 

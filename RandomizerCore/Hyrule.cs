@@ -3502,21 +3502,7 @@ HelmetHeadGoomaFix:
 """, "helmethead_gooma_fix.s");
         engine.Modules.Add(assembler.Actions);
     }
-
     private void RestartWithPalaceUpA(Engine engine) {
-        
-        /*
-        Up + A:
-        1cbba(cbaa): insert jump to d39a (1d3aa) (209ad3)
-        1d3aa(d39a): store 707(8D0707) compare to 3(c903) less than 2 jump(3012) Load FB1 (ADb10f)compare with zero(c901) branch if zero(f00B) Load 561(AD6105) store accumulator into side memory(8Db00f) load accumulator with 1(a901) store to fb1(8db10f) return (60)
-        d3bc(1d3cc): Load accumulator with fbo (adb00f)store to 561(8d6105) load 707(AD0707) return (60)
-        feb3(1fec3): Store y into 707(8c0707) load 0(a900) stor into fb1(8db10f) return (60)
-        CAD0(1CAE0): (20bcd3) c902 10
-        CAE3(1CAF3): NOP NOP NOP(EAEAEA)
-        CF92: (1CFA2): Jump to feb3(20b3fe)
-
-        */
-
         Assembler.Assembler a = new();
         a.Code("""
 update_next_level_exp = $a057
@@ -3545,9 +3531,10 @@ PalacePatch:
         sta $07b1 ; store the area code into a temp ram location
         lda #$01
         sta $07b0 ; set a flag in another empty ram location
-        lda world_state
 @Exit:
-        rts
+    lda world_state
+    rts
+
 ReloadExpForReset:
     lda $07b1
     sta area_code
@@ -3616,6 +3603,8 @@ FixSoftlock:
     {
         Assembler.Assembler a = new();
         a.Assign("ENABLE_PARALLAX_BACKGROUND", useParallax ? 1 : 0);
+        a.Assign("CAVE_BACKGROUND", 0);
+        a.Assign("CASTLE_BRICK", 6);
         a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.Parallax.s"), "parallax.s");
         engine.Modules.Add(a.Actions);
     }
@@ -3639,29 +3628,6 @@ StandardizeDrops:
     rts
 """, "standardize_drops.s");
         engine.Modules.Add(a.Actions);
-        ROMData.Put(0x1e8bd, 0x20);
-        ROMData.Put(0x1e8be, 0x4c);
-        ROMData.Put(0x1e8bf, 0xff);
-
-        ROMData.Put(0x1ff5c, 0xc0);
-        ROMData.Put(0x1ff5d, 0x02);
-        ROMData.Put(0x1ff5e, 0xd0);
-        ROMData.Put(0x1ff5f, 0x07);
-        ROMData.Put(0x1ff60, 0xad);
-        ROMData.Put(0x1ff61, 0xfe);
-        ROMData.Put(0x1ff62, 0x06);
-        ROMData.Put(0x1ff63, 0xee);
-        ROMData.Put(0x1ff64, 0xfe);
-        ROMData.Put(0x1ff65, 0x06);
-        ROMData.Put(0x1ff66, 0x60);
-        ROMData.Put(0x1ff67, 0xad);
-        ROMData.Put(0x1ff68, 0xff);
-        ROMData.Put(0x1ff69, 0x06);
-        ROMData.Put(0x1ff6a, 0xee);
-        ROMData.Put(0x1ff6b, 0xff);
-        ROMData.Put(0x1ff6c, 0x06);
-        ROMData.Put(0x1ff6d, 0x60);
-
     }
 
     private void ApplyAsmPatches(RandomizerProperties props, Engine engine, Random RNG)

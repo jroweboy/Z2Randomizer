@@ -37,6 +37,10 @@ HandleLagFrame:
     ; To allow for testing between the flag on or off, I made it a soft flag 
     lda #PREVENT_HUD_FLASH_ON_LAG
     beq -
+
+    lda $74c
+    cmp #2
+    bcs -
     ; check to see if rendering is even enabled (if its not then we aren't gonna scroll split)
     lda $fe
     and #$10

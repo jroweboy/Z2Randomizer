@@ -242,6 +242,7 @@ public class ROM
         {
             for (int j = 0; j < 3; j++)
             {
+                
                 Put(outBricks[i] + j, (byte)bricks[i][j]);
                 Put(inBricks[i] + j, (byte)bricks[i][j]);
                 Put(inCurtains[i] + j, (byte)curtains[i][j]);
@@ -717,69 +718,6 @@ LoadMapData:
 
 """, "extend_map_size.s");
         engine.Modules.Add(a.Actions);
-        /*
-         * cd9b: a000          LDY #$00              # Initialize start index
-        cd9d: b102          LDA ($02,Y)           # load from source
-        cd9f: 9120          STA ($20,Y)           # store to dest
-        cda1: c8            INY
-        cda2: 10f9          BPL $f9 (target=cd9d) # do it 128 times
-        cda4: ca            DEX                   # decrement counter
-        cda5: f00e          BEQ $0e (target=cdb5) # done yet?
-        cda7: b102          LDA ($02,Y)           # load from source
-        cda9: 9120          STA ($20,Y)           # store to dest
-        cdab: c8            INY
-        cdac: d0f9          BNE $f9 (target=cda7) # 128 more times
-        cdae: e603          INC $03               # increment source pointer
-        cdb0: e621          INC $21               # increment dest pointer
-        cdb2: ca            DEX                   # decrement counter
-        cdb3: d0e8          BNE $e8 (target=cd9d) # not done? do it again.
-        cdb5: 60            RTS                   # return to caller
-        */
-
-        // Put(0x1cda8, new byte[] { 0x4c, 0xc6, 0xcd, 0xa0, 0x00, 0xb1, 0x02, 0x91, 0x20, 0xc8, 0x10, 0xf9, 0xca, 0xf0, 0x0e, 0xb1, 0x02, 0x91, 0x20, 0xc8, 0xd0, 0xf9, 0xe6, 0x03, 0xe6, 0x21, 0xca, 0xd0, 0xe8, 0x60 });
-
-        //# Fill with NOPs all the way to $cdc6
-        // for (int i = 0x1cdc6; i < 0x1cdd6; i++)
-        // {
-        //     Put(i, 0xea);
-        // }
-
-        /*
-         * cdc6: ae0607        LDX $0706       # load overworld number into X
-            cdc9: bd27cd        LDA $cd27,X     # overworld to map pointer offset
-            cdcc: aa            TAX             # into index X
-            cdcd: bd0885        LDA $8508,X     # put ROM pointer into $02-$03
-            cdd0: 8502          STA $02
-            cdd2: bd0985        LDA $8509,X
-            cdd5: 8503          STA $03
-        */
-        // Put(0x1cdd6, new byte[] { 0xae, 0x06, 0x07, 0xbd, 0xf1, 0xff, 0xaa, 0xbd, 0x08, 0x85, 0x85, 0x02, 0xbd, 0x09, 0x85, 0x85, 0x03 });
-
-        /*
-         * cdd7: a900          LDA #$00        # put destination $7c00 into $20-$21
-            cdd9: 8520          STA $20
-            cddb: a97c          LDA #$7a
-            cddd: 8521          STA $21
-            cddf: a207          LDX #$07        # 7 half-pages == 896 bytes
-            cde1: 209bcd        JSR $cd9b       # copy
-        */
-
-        // Put(0x1cde7, new byte[] { 0xa9, 0x00, 0x85, 0x20, 0xa9, 0x7a, 0x85, 0x21, 0xa2, 0x0b, 0x20, 0x9b, 0xcd });
-
-        /*
-         * cde4: a9a0          LDA #$a0        # load source $88a0 into $02-$03
-            cde6: 8502          STA $02
-            cde8: a988          LDA #$88
-            cdea: 8503          STA $03
-            cdec: a970          LDA #$70        # load dest $7000 into $20-$21 (address
-            cdee: 8521          STA $21         #   $20 should still be 0)
-            cdf0: a208          LDX #$08        # 8 half-pages == 1024 bytes
-            cdf2: 209bcd        JSR $cd9b       # copy
-        */
-
-        // Put(0x1cdf4, new byte[] { 0xa9, 0xa0, 0x85, 0x02, 0xa9, 0x88, 0x85, 0x03, 0xa9, 0x70, 0x85, 0x21, 0xa2, 0x08, 0x20, 0x9b, 0xcd });
-
-        // Put(0x808, 0x7a);
     }
 
     public void DisableTurningPalacesToStone()
