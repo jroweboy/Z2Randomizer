@@ -102,7 +102,7 @@
 "ShuffleAttackExperience": false,
 "ShuffleDripperEnemy": false,
 "ShuffleEncounters": false,
-"ShuffleEnemyHP": false,
+"ShuffleEnemyHP": true,
 "ShuffleGP": false,
 "ShuffleItemDropFrequency": true,
 "ShuffleLifeExperience": false,
