@@ -38,6 +38,14 @@
             </CheckBox>
             <CheckBox
                 IsThreeState="True"
+                IsEnabled="{Binding Config.IncludeSpellsInShuffle, FallbackValue=true}"
+                IsChecked="{Binding Config.EnableSpellMenuHints}"
+                Content="Enable Spell Location Menu Hints"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EnableSpellMenuHintsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
                 IsChecked="{Binding Config.EnableTownNameHints}"
                 Content="Enable Town Name Hints"
             >

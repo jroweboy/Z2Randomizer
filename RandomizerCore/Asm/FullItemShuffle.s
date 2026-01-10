@@ -503,3 +503,85 @@ ItemPaletteTable:
     .byte $01 ; Spell Spell
     .byte $01 ; Thunder Spell
     .byte $01 ; Dash Spell
+
+.if _SPELL_MENU_HINTS
+
+BLANK_LINE = $9bc6
+
+.segment "PRG0"
+.org $a616
+    jsr ShowSpellMenuHintIfEnabled
+.reloc
+ShowSpellMenuHintIfEnabled:
+    lda SpellHintEnable
+    bne @Disabled
+        ; Spell location hints on, check to see if we have a letter at this spot
+        cpy #$0c
+        bcs @Disabled
+        tya
+        ; sec ; carry is guaranteed to NOT be set so it'll subtract one extra
+        sbc #$01
+        bcc @Disabled
+        pha ; store the letter offset for now
+        ; load the letter by multiplying the spell ID by 10. use $00 as scratch space
+        ldx $00
+        lda $0525
+        asl ; * 2
+        sta $00
+        asl ; * 4
+        asl ; * 8 then we add $00 to make it * 10
+        ; clc ; carry is guaranteed clear due to the range check + asl
+        adc $00
+        sta $00
+        pla
+        adc $00
+        ; a is now the letter offset for the spell hint name
+        ; so restore the value in $00 and use X as the offset
+        stx $00
+        tax ; current letter offset * 10
+        lda SpellLocationNameTable,x
+        rts
+@Disabled:
+    ; User turned spell hints off, so use the original blank gap
+    lda BLANK_LINE, y
+    rts
+
+.org $A256
+    jmp CheckMenuInputs
+FREE_UNTIL $A267
+.reloc
+CheckMenuInputs:
+    lda $0744
+    and #$10 | $40 ; check if they just pressed start or b
+    sta $00
+    lda $F7
+    and #$10 | $40
+    beq @noInputs
+    cmp $00
+    beq @noInputs
+        and #$10
+        bne @closeMenu
+            ; We pushed b so we want to toggle the hints
+            lda #1
+            sta SpellHintSwitched
+            eor SpellHintEnable
+            sta SpellHintEnable
+@closeMenu:
+    inc $0524
+@noInputs:
+    rts
+
+.org $A343
+    jmp CheckIfReopeningMenu
+.reloc
+CheckIfReopeningMenu:
+    sta $0567
+    lda SpellHintSwitched
+    beq @exit
+        sta $0524 ; restart the menu
+        lda #0
+        sta SpellHintSwitched
+@exit:
+    rts
+
+.endif

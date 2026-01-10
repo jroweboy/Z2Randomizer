@@ -301,6 +301,13 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             Main.Config.ShuffleMagicExperience = true;
             Main.Config.ShuffleLifeExperience = true;
         });
+
+        // If Shuffle spell items is off, turn off spell menu hints and disable it
+        Main.Config.ObservableForProperty(x => x.IncludeSpellsInShuffle).Subscribe(x =>
+        {
+            if (x.Value ?? true) return;
+            Main.Config.EnableSpellMenuHints = false;
+        });
     }
 
     private string validatedFlags = "";

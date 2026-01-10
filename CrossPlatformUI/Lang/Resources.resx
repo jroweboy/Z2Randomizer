@@ -848,4 +848,9 @@ Random selects a random number of starting lives between 2 and 5.</value>
 <value>For flags set to an indeterminate value (question mark), those flags will be on or off at
 random, at the freqency specified by this flag.</value>
 	</data>
+	<data name="EnableSpellMenuHintsToolTip" xml:space="preserve">
+		<value>When enabled, if you do not have a spell, the spell menu shows the location for each of the spells (listed in the vanilla spell order) 
+
+This can only be enabled when Shuffle Spell Items is enabled. If Shuffle Spell Items is a random flag, then this flag will only be enabled if the seed rolls shuffle spell items.</value>
+	</data>
 </root>

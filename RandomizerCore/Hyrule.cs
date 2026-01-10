@@ -4,6 +4,7 @@ using js65;
 using NLog;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -3332,8 +3333,8 @@ public class Hyrule
         {
             if (item.IsItemGetItem() && ItemGet.ContainsKey(item))
             {
-                Location? location = AllLocationsForReal().Where(i => i.Collectables.Contains(item)).FirstOrDefault();
-                sb.AppendLine(item.ToString() + "(" + ItemGet[item] + ") : " + location?.Name);
+                Location? location = AllLocationsForReal().FirstOrDefault(i => i.Collectables.Contains(item));
+                sb.AppendLine($"{item}({ItemGet[item]}) : {location?.Name}");
             }
         }
         foreach(Location location in AllLocationsForReal())
@@ -3542,17 +3543,43 @@ CustomFileSelectData:
         return false;
     }
 
-    private void FullItemShuffle(Assembler asm, IEnumerable<Location> nonSideviewLocations)
+    private void FullItemShuffle(Assembler asm, IEnumerable<Location> allLocations, IEnumerable<Location> nonSideViewLocations)
     {
+        var locs = allLocations.ToImmutableList();
         var a = asm.Module();
+
+        if (props.SpellMenuHints)
+        {
+            a.Segment("PRG0");
+            a.Reloc();
+            a.Label("SpellLocationNameTable");
+            // .Export() is broken right now...... so just reuse the same module
+            var fireDash = props.ReplaceFireWithDash;
+            var hints = Text.GenerateSpellMenuHints(locs, fireDash);
+            // Get a list of the 8 spells in this seed (replacing fire with dash if thats replaced)
+            var allspells = Enum.GetValues<Collectable>()
+                .Where(c => c.IsSpell() && (fireDash ? c != Collectable.FIRE_SPELL : c != Collectable.DASH_SPELL))
+                .Order().ToImmutableList();
+            foreach (var spell in allspells)
+            {
+                var hint = Util.ToGameText(hints[spell]);
+                for (int i = 0; i < 10; i++)
+                {
+                    var letter = i < hint.Length ? hint[i] : (byte)0xf4;
+                    a.Byt(letter);
+                }
+            }
+        }
+
         foreach (var collect in Enum.GetValues<Collectable>())
         {
             a.Set($"{collect.ToString().ToUpper()}_ITEMLOC", (int)collect);
         }
-        foreach (var loc in nonSideviewLocations)
+        foreach (var loc in nonSideViewLocations)
         {
             a.Set($"{loc.VanillaCollectable.ToString().ToUpper()}_ITEMLOC", (int)loc.Collectables[0]);
         }
+        a.Set("_SPELL_MENU_HINTS", props.SpellMenuHints ? 1 : 0);
         a.Set("_REPLACE_FIRE_WITH_DASH", props.ReplaceFireWithDash ? 1 : 0);
         a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);
         a.Set("_DO_SPELL_SHUFFLE_WIZARD_UPDATE", props.IncludeSpellsInShuffle ? 1 : 0);
@@ -3969,13 +3996,13 @@ EndTileComparisons = $8601
 
     private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom)
     {
-        bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
+        bool randomizeMusic = props is { DisableMusic: false, RandomizeMusic: true };
 
         ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic);
         rom.AddRandomizerToTitle(engine);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
-        FullItemShuffle(engine, GetNonSideviewItemLocations());
+        FullItemShuffle(engine, AllLocationsForReal(), GetNonSideviewItemLocations());
         rom.DontCountExpDuringTalking(engine);
         rom.FixElevatorPositionInFallRooms(engine);
         rom.AllowForChangingDoorYPosition(engine);

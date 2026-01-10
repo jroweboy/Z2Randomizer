@@ -13,7 +13,7 @@ public class Location
     public int appear2loweruponexit;
     public List<Collectable> Collectables { get; set; }
     public Collectable VanillaCollectable { get; set; }
-    public bool AppearsOnMap { get; set; }
+    public bool AppearsOnMap { get; init; }
 
     public Terrain TerrainType { get; set; }
     public int Ypos { get; set; }
@@ -34,10 +34,7 @@ public class Location
 
     public (int, int) Coords
     {
-        get
-        {
-            return (Ypos, Xpos);
-        }
+        get => (Ypos, Xpos);
 
         set
         {
@@ -78,8 +75,8 @@ public class Location
     public Continent Continent { get; set; }
     public Continent? VanillaContinent { get; set; }
     public Continent? ConnectedContinent { get; set; }
-    public int FallInHole { get; set; }
-    public int ForceEnterRight { get; set; }
+    public int FallInHole { get; init; }
+    public int ForceEnterRight { get; init; }
     public int Secondpartofcave { get; set; }
 
     public string Name { get; set; }
@@ -281,7 +278,7 @@ public class Location
             (_, 52, 7, 41) => "RAFT_TILE",
             (_, 37, 7, 42) => "DM_ENTRANCE_CAVE",
             (_, 37, 23, 43) => "DM_EXIT_CAVE",
-            (_, _, _, _) => "Unknown (" + Continent.GetName(Continent) + ")"
+            (_, _, _, _) => "Unknown (" + Enum.GetName(Continent) + ")"
         };
 
         ActualTown = (Continent, Ypos, Xpos, Map) switch
@@ -301,7 +298,7 @@ public class Location
 
         if (Name.StartsWith("Unknown") && Xpos != 0 && Ypos != 0)
         {
-            logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Ypos + ", " + Xpos + ") Map: " + Map);
+            logger.Info("Missing location name on " + Enum.GetName(Continent) + " (" + Ypos + ", " + Xpos + ") Map: " + Map);
         }
         if (Name.Contains("FAKE"))
         {
@@ -345,12 +342,10 @@ public class Location
 
     public string GetDebuggerDisplay()
     {
-        return Continent.ToString()
-            + " " + TerrainType.ToString()
-            + " " + Name
-            + " (" + (Ypos - 30) + "," + (Xpos) + ") _"
-            + (Reachable ? "Reachable " : "Unreachable ")
-            + '[' + string.Join(", ", Collectables.Select(i => i.ToString())) + ']';
+        return
+            $"{Continent} {TerrainType} {Name} " +
+            $"({(Ypos - 30)},{(Xpos)}) _{(Reachable ? "Reachable " : "Unreachable ")}" +
+            $"[{string.Join(", ", Collectables.Select(i => i.ToString()))}]";
     }
 
     public int GetWorld()

@@ -481,6 +481,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool? enableSpellItemHints;
 
     [Reactive]
+    private bool? enableSpellMenuHints;
+
+    [Reactive]
     private bool? enableTownNameHints;
 
     [Reactive]
@@ -1297,6 +1300,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
         //Hints
         properties.SpellItemHints = enableSpellItemHints ?? GetIndeterminateFlagValue(r);
+        properties.SpellMenuHints = properties.IncludeSpellsInShuffle && (enableSpellMenuHints ?? GetIndeterminateFlagValue(r));
         properties.HelpfulHints = enableHelpfulHints ?? GetIndeterminateFlagValue(r);
         properties.TownNameHints = enableTownNameHints ?? GetIndeterminateFlagValue(r);
 

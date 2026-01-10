@@ -179,6 +179,8 @@ RESV DripperRedCounter
 RESV PpuCtrlForIrq
 RESV ScrollPosForIrq
 RESV IrqSetupAlready
+RESV SpellHintEnable
+RESV SpellHintSwitched
 
 .assert RES_BASE + RES_OFFSET < $01ad
 
